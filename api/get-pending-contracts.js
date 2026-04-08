@@ -26,9 +26,14 @@ export default async function handler(req, res) {
   try {
     const { data, error } = await supabase
       .from('contract_logs')
-      .select('*')
-      .lt('workflow_stage', 3)
-      .order('created_at', { ascending: false });
+      .select('*') // lấy tất cả các cột
+      .order('created_at', { ascending: false }); // sắp xếp mới nhất lên trước
+
+    if (error) {
+      console.error('Supabase query error:', error);
+    } else {
+      console.log('Contracts:', data);
+    }
 
     if (error) throw error;
 
