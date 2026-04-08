@@ -323,7 +323,7 @@ function OnboardingForm({ onSubmit, maskSalary = false }) {
     const fetchContracts = async () => {
       console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
       try {
-        const res = await fetch('http://localhost:3000/api/get-pending-contracts');
+        const res = await fetch('/api/get-pending-contracts');
         const json = await res.json();
         if (res.ok) {
           setPendingContracts(json.contracts || []);
