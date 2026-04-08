@@ -6,6 +6,9 @@ import {
 } from 'lucide-react';
 import { differenceInDays, addMonths, format, parseISO } from 'date-fns';
 import { apiFetch } from '../utils/api.js';
+import { supabase } from '../utils/supabase';
+import { useGoogleLogin } from '@react-oauth/google';
+
 
 export default function PersonnelMovementView({ employees, setEmployees, movements: _movements, setMovements: _setMovements, userRole, branchId }) {
   const [activeSubTab, setActiveSubTab] = useState('onboarding');
@@ -175,34 +178,58 @@ export default function PersonnelMovementView({ employees, setEmployees, movemen
     }
   };
 
-  const decide = async (movement, decision, decisionNote) => {
+  const decide = async (movement, action, note = '') => {
     setBusy(true);
+
+    // Map action thành trạng thái mới
+    let newStatus = '';
+    if (action === 'APPROVE') newStatus = 'APPROVED';
+    if (action === 'REJECT') newStatus = 'REJECTED';
+    if (action === 'REVISION') newStatus = 'REVISION';
+
     try {
-      const token = String(localStorage.getItem('token') || '').trim();
-      const resp = await apiFetch('/api/movements/decide', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ id: movement.id, decision, decisionNote }),
-      });
-      const data = await resp.json();
-      if (!resp.ok || !data?.ok) throw new Error(data?.message || 'decide_failed');
-      if (data.updatedEmployee) {
-        const uiEmp = mapDbEmployeeToUi(data.updatedEmployee);
-        if (uiEmp) {
-          setEmployees(prev => {
-            const list = Array.isArray(prev) ? prev : [];
-            const idx = list.findIndex(e => e.id === uiEmp.id);
-            if (idx < 0) return [...list, uiEmp];
-            const next = [...list];
-            next[idx] = { ...next[idx], ...uiEmp };
-            return next;
-          });
-        }
-      }
-      setNotifications(prev => [...prev, { id: Date.now(), message: `Đã xử lý yêu cầu ${movement.type} cho ${movement.employeeName}`, type: decision === 'APPROVE' ? 'success' : decision === 'REJECT' ? 'error' : 'warning' }]);
-      loadAdminHistory();
+      // 1️⃣ Cập nhật Supabase
+      const { error } = await supabase
+        .from('bien_dong_nhan_su')
+        .update({
+          trang_thai: newStatus,
+          ghi_chu: note,          // Ghi chú HRM hoặc lý do
+          created_at: new Date()  // Nếu có cột updated_at
+        })
+        .eq('ma_nv', movement.details.employeeId);
+
+      if (error) throw error;
+
+      // 2️⃣ Cập nhật state local để UI phản hồi ngay
+      setMovements(prev =>
+        prev.map(m =>
+          m.id === movement.id
+            ? { ...m, status: newStatus, decisionNote: note }
+            : m
+        )
+      );
+
+      // 3️⃣ Thông báo
+      setNotifications(prev => [
+        ...prev,
+        {
+          id: Date.now(),
+          message: `Đã xử lý yêu cầu ${movement.type} cho ${movement.employeeName}`,
+          type: action === 'APPROVE' ? 'success' : action === 'REJECT' ? 'error' : 'warning',
+        },
+      ]);
+
+      // 4️⃣ Đóng modal nếu đang mở
+      setSelected(null);
     } catch (e) {
-      setNotifications(prev => [...prev, { id: Date.now(), message: `Xử lý thất bại: ${e?.message || String(e)}`, type: 'error' }]);
+      setNotifications(prev => [
+        ...prev,
+        {
+          id: Date.now(),
+          message: `Xử lý thất bại: ${e.message || String(e)}`,
+          type: 'error',
+        },
+      ]);
     } finally {
       setBusy(false);
     }
@@ -352,8 +379,21 @@ function OnboardingForm({ onSubmit, maskSalary = false }) {
     return actual.split('+').map(s => s.trim());
   }, [selectedContract]);
 
+  const loginGoogle = useGoogleLogin({
+    scope: 'https://www.googleapis.com/auth/drive.file',
+    onSuccess: (tokenResponse) => {
+      localStorage.setItem('google_token', tokenResponse.access_token);
+    },
+    onError: () => {
+      alert('Đăng nhập Google thất bại');
+    }
+  });
+
+  const FOLDER_ID = '1cBAPmzzhqVhu5KTNvRJw3_HHgovH-k28'; // 👈 folder của người khác đã share
+
   const handleSubmitForm = async () => {
     try {
+      // ✅ Validate
       if (!formData.scanFile) {
         alert('Bạn bắt buộc phải tải lên bản Scan ký tay');
         return;
@@ -364,44 +404,105 @@ function OnboardingForm({ onSubmit, maskSalary = false }) {
         return;
       }
 
-      setLoading(true);
+      let token = localStorage.getItem('google_token');
 
-      // 1. Tạo FormData gửi API
-      const form = new FormData();
-      form.append('file', formData.scanFile);
-      form.append('employeeId', formData.employeeId);
-      form.append('name', formData.name);
-
-      // 2. Gọi API upload Google Drive
-      const res = await fetch('http://localhost:3000/api/upload-drive', {
-        method: 'POST',
-        body: form
-      });
-
-      const data = await res.json();
-      console.log('RESPONSE:', data);
-
-      if (!res.ok) {
-        throw new Error('Upload thất bại');
+      // ✅ Auto login nếu chưa có token
+      if (!token) {
+        await new Promise((resolve, reject) => {
+          loginGoogle({
+            onSuccess: (tokenResponse) => {
+              localStorage.setItem('google_token', tokenResponse.access_token);
+              token = tokenResponse.access_token;
+              resolve();
+            },
+            onError: () => reject(new Error('Login Google thất bại'))
+          });
+        });
       }
 
-      // 3. Gửi dữ liệu hoàn chỉnh lên hệ thống
+      if (!token) throw new Error('Không lấy được token Google');
+
+      setLoading(true);
+
+      const files = [formData.scanFile, ...(formData.otherFiles || [])];
+      const uploadedFiles = [];
+
+      // 🚀 Upload từng file
+      for (const file of files) {
+        const metadata = {
+          name: `${formData.employeeId}_${Date.now()}_${file.name}`, // tránh trùng
+          mimeType: file.type,
+          parents: [FOLDER_ID] // 👈 QUAN TRỌNG: upload vào drive người khác
+        };
+
+        const formUpload = new FormData();
+        formUpload.append(
+          'metadata',
+          new Blob([JSON.stringify(metadata)], { type: 'application/json' })
+        );
+        formUpload.append('file', file);
+
+        const res = await fetch(
+          'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`
+            },
+            body: formUpload
+          }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error('Upload thất bại: ' + JSON.stringify(data));
+        }
+
+        const fileId = data.id;
+
+        // 🔓 (Optional) Cho phép ai cũng xem
+        await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            role: 'reader',
+            type: 'anyone'
+          })
+        });
+
+        uploadedFiles.push({
+          fileId,
+          name: file.name,
+          url: `https://drive.google.com/file/d/${fileId}/view`
+        });
+      }
+
+      // 👉 Gửi về hệ thống
       const finalPayload = {
         ...formData,
         checklist: checklistValues,
-        driveFileId: data.fileId,
-        driveUrl: data.url
+        attachments: uploadedFiles
       };
 
-      // 👉 callback bạn đang có
       await onSubmit(finalPayload);
 
-      // 4. UX success
-      alert('✅ Báo tăng thành công');
+      alert('✅ Upload + lưu thành công');
 
     } catch (err) {
       console.error(err);
-      alert('❌ Có lỗi xảy ra: ' + err.message);
+
+      // ❗ Token hết hạn → login lại
+      if (err.message.includes('401')) {
+        localStorage.removeItem('google_token');
+        alert('Phiên đăng nhập hết hạn, vui lòng thử lại');
+      } else {
+        alert('❌ Lỗi: ' + err.message);
+      }
+
     } finally {
       setLoading(false);
     }
@@ -1232,19 +1333,18 @@ function MovementDetailModal({ movement, onClose, onApprove, onReject, onRevisio
 }
 
 // ─── DASHBOARD: HRM PHÊ DUYỆT ─────────────────────────────────────────
-function ApprovalDashboard({ movements, onApprove, onReject, onRevision }) {
-  const [movements, setMovements] = useState([]);
+function ApprovalDashboard({ onApprove, onReject, onRevision }) {
+  const [localMovements, setLocalMovements] = useState([]);
   const [selected, setSelected] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // ✅ Lấy dữ liệu từ API
+  // Lấy dữ liệu từ API
   useEffect(() => {
     async function loadData() {
       try {
         const response = await fetch('https://hopdong-delta.vercel.app/api/get-pending-bd');
         const data = await response.json();
 
-        // Nếu API trả về field khác, map về đúng structure movements
         const formatted = (data.contracts || []).map(item => ({
           id: item.ma_nv || item.contractId || Math.random().toString(36).substr(2, 9),
           employeeName: item.ten_nhan_vien || item.name || '---',
@@ -1272,18 +1372,18 @@ function ApprovalDashboard({ movements, onApprove, onReject, onRevision }) {
           attachments: item.attachments || []
         }));
 
-        setMovements(formatted);
+        setLocalMovements(formatted);
       } catch (err) {
         console.error("Lỗi load movements:", err);
-        setMovements([]);
+        setLocalMovements([]);
       }
     }
     loadData();
-  }, []); // Chỉ chạy 1 lần khi mount
-  
+  }, []);
+
   const sortedMovements = useMemo(() => {
-    return [...movements].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-  }, [movements]);
+    return [...localMovements].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  }, [localMovements]);
 
   const pending = sortedMovements.filter(m => m.status === 'PENDING' || m.status === 'REVISION');
   const history = sortedMovements.filter(m => {
@@ -1297,52 +1397,48 @@ function ApprovalDashboard({ movements, onApprove, onReject, onRevision }) {
            dateStr.includes(q);
   });
 
-  const renderMovement = (m) => {
+  const renderMovement = (m, isHistory = false) => {
     let bClass = 'bg-white border-slate-200 hover:border-blue-400';
     if (m.status === 'APPROVED') bClass = 'bg-emerald-50/40 border-emerald-500 hover:border-emerald-600';
     if (m.status === 'REJECTED') bClass = 'bg-red-50/40 border-red-500 hover:border-red-600';
 
     return (
-    <div key={m.id} onClick={() => setSelected(m)} className={`p-4 border-2 rounded-2xl mb-3 cursor-pointer transition-all shadow-sm group flex flex-col justify-between ${bClass}`}>
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-4">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 ${
-            m.type === 'ONBOARDING' ? 'bg-blue-100 text-blue-600' :
-            m.type === 'LEAVE' ? 'bg-purple-100 text-purple-600' :
-            'bg-orange-100 text-orange-600'
-          }`}>
-            {m.type.charAt(0)}
+      <div key={m.id} onClick={() => setSelected(m)} className={`p-4 border-2 rounded-2xl mb-3 cursor-pointer transition-all shadow-sm group flex flex-col justify-between ${bClass}`}>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-4">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0 ${
+              m.type === 'ONBOARDING' ? 'bg-blue-100 text-blue-600' :
+              m.type === 'LEAVE' ? 'bg-purple-100 text-purple-600' :
+              'bg-orange-100 text-orange-600'
+            }`}>
+              {m.type.charAt(0)}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-slate-800">{m.employeeName}</span>
+                <StatusBadge status={m.status} />
+              </div>
+              <div className="text-xs text-slate-500 mt-0.5">
+                 <span className="font-medium text-slate-700">{m.branchId}</span> · {m.details?.position || m.details?.newRole || m.type} · {m.createdAt ? format(parseISO(m.createdAt), 'dd/MM/yyyy') : ''}
+              </div>
+            </div>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-800">{m.employeeName}</span>
-              <StatusBadge status={m.status} />
-            </div>
-            <div className="text-xs text-slate-500 mt-0.5">
-               <span className="font-medium text-slate-700">{m.branchId}</span> · {m.details?.position || m.details?.newRole || m.type} · {m.createdAt ? format(parseISO(m.createdAt), 'dd/MM/yyyy') : ''}
-            </div>
+          <div className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-[11px] font-bold flex items-center gap-1 shrink-0">
+             Xem hồ sơ <ArrowRightLeft size={14} />
           </div>
         </div>
-        <div className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-[11px] font-bold flex items-center gap-1 shrink-0">
-           Xem hồ sơ <ArrowRightLeft size={14} />
-        </div>
+        
+        {(m.status === 'REJECTED' || m.status === 'REVISION') && m.decisionNote && (
+          <div className={`mt-3 pt-3 border-t ${m.status === 'REJECTED' ? 'border-red-200' : 'border-orange-200'} w-full`}>
+            <div className={`text-[11px] px-3 py-2 rounded-xl inline-block w-full ${m.status === 'REJECTED' ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800'}`}>
+               <strong className={`${m.status === 'REJECTED' ? 'text-red-900' : 'text-orange-900'} block mb-0.5`}>
+                 {m.status === 'REJECTED' ? 'Lý do từ chối:' : 'Ghi chú HRM:'}
+               </strong> 
+               {m.decisionNote}
+            </div>
+          </div>
+        )}
       </div>
-      
-      {m.status === 'REJECTED' && m.decisionNote && (
-        <div className="mt-3 pt-3 border-t border-red-200 w-full">
-          <div className="text-[11px] bg-red-100 text-red-800 px-3 py-2 rounded-xl inline-block w-full">
-             <strong className="text-red-900 block mb-0.5">Lý do từ chối:</strong> {m.decisionNote}
-          </div>
-        </div>
-      )}
-      {m.status === 'REVISION' && m.decisionNote && (
-        <div className="mt-3 pt-3 border-t border-orange-200 w-full">
-          <div className="text-[11px] bg-orange-100 text-orange-800 px-3 py-2 rounded-xl inline-block w-full">
-             <strong className="text-orange-900 block mb-0.5">Ghi chú HRM:</strong> {m.decisionNote}
-          </div>
-        </div>
-      )}
-    </div>
     );
   };
 
