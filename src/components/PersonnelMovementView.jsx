@@ -414,9 +414,9 @@ function OnboardingForm({ onSubmit, maskSalary = false }) {
 
     setFormData(prev => ({
       ...prev,
-      employeeId: c.employeeId || '',
-      contractNumber: c.soHd || '',
-      name: c.ho_ten || '',
+      employeeId: c.employee_id || '',
+      contractNumber: c.so_hd || '',
+      name: c.employee_name || '',
       nationality: c.quoc_tich || 'Việt Nam',
       birthDate: c.ngay_sinh || '',
       birthPlace: c.noi_sinh || '',
@@ -927,9 +927,40 @@ function CareerMovementForm({ employees, onSubmit, maskSalary = false }) {
 }
 
 // ─── COMPONENT: DANH SÁCH LỊCH SỬ (Cho cả Chi nhánh & Admin) ───────────
-function HistoryList({ movements }) {
+function HistoryList() {
+  const [movements, setMovements] = useState([]);
   const [selected, setSelected] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // ✅ Lấy dữ liệu từ API
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const response = await fetch('https://hopdong-delta.vercel.app/api/get-pending-bd');
+        const data = await response.json();
+
+        // Nếu API trả về field khác, map về đúng structure movements
+        const formatted = (data.contracts || []).map(item => ({
+          id: item.ma_nv || item.contractId || Math.random().toString(36).substr(2, 9),
+          employeeName: item.ten_nhan_vien || item.name || '---',
+          status: item.trang_thai || 'PENDING',
+          createdAt: item.created_at || item.dateCreated || new Date().toISOString(),
+          type: item.loai_bien_dong || 'ONBOARDING',
+          branchId: item.chi_nhanh || item.branch || '---',
+          details: item.chuc_danh || {},
+          decisionNote: item.ghi_chu || item.note || '',
+          branchNote: item.ghi_chu || '',
+          attachments: item.link_file || []
+        }));
+
+        setMovements(formatted);
+      } catch (err) {
+        console.error("Lỗi load movements:", err);
+        setMovements([]);
+      }
+    }
+    loadData();
+  }, []); // Chỉ chạy 1 lần khi mount
 
   const sortedMovements = useMemo(() => {
     return [...movements].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
