@@ -323,13 +323,10 @@ function OnboardingForm({ onSubmit, maskSalary = false }) {
     const fetchContracts = async () => {
       console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
       try {
-        const res = await fetch('/api/get-pending-contracts');
-        const json = await res.json();
-        if (res.ok) {
-          setPendingContracts(json.contracts || []);
-        } else {
-          console.error('Lỗi lấy hợp đồng:', json.error);
-        }
+        fetch("https://hopdong-delta.vercel.app/api/test")
+        .then(res => res.json())
+        .then(data => console.log("API response:", data))
+        .catch(err => console.error("API error:", err));
       } catch (err) {
         console.error('Lỗi fetch hợp đồng:', err);
       }
