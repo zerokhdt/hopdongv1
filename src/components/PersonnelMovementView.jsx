@@ -172,7 +172,6 @@ export default function PersonnelMovementView({ employees, setEmployees, movemen
       if (isAdmin) loadAdminHistory();
       else loadMy();
     } catch (e) {
-      alert(`Gửi yêu cầu thất bại: ${e?.message || String(e)}`);
     } finally {
       setBusy(false);
     }
@@ -489,6 +488,26 @@ function OnboardingForm({ onSubmit, maskSalary = false }) {
       };
 
       await onSubmit(finalPayload);
+
+      const { error } = await supabase
+        .from('bien_dong_nhan_su')
+        .insert([
+          {
+            ma_nv: formData.employeeId,
+            ten_nhan_vien: formData.name,
+            chuc_danh: formData.position,
+            chi_nhanh: formData.department,
+            muc_luong: formData.salary ? Number(formData.salary) : null,
+            loai_bien_dong: 'PENDING', // 👈 mặc định
+            link_file: uploadedFiles.map(f => f.url).join(', '), // nhiều file
+            trang_thai: 'PENDING', // 👈 nên có
+            ghi_chu: formData.note || ''
+          }
+        ]);
+
+      if (error) {
+      throw new Error('Lưu DB thất bại: ' + error.message);
+    }
 
       alert('✅ Upload + lưu thành công');
 
