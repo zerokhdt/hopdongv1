@@ -1,0 +1,14 @@
+export const THEMES = {
+  slate:  { id: 'slate',  name: 'Xám',        hex: '#64748b', lightHex: '#f8fafc', light: 'bg-slate-50 border-slate-200',  text: 'text-slate-700',  base: 'bg-slate-500 hover:bg-slate-600',  dark: 'bg-slate-600 border-slate-700 text-white',  accent: 'border-slate-400' },
+  blue:   { id: 'blue',   name: 'Xanh dương',  hex: '#3b82f6', lightHex: '#eff6ff', light: 'bg-blue-50 border-blue-200',    text: 'text-blue-700',   base: 'bg-blue-500 hover:bg-blue-600',    dark: 'bg-blue-600 border-blue-700 text-white',    accent: 'border-blue-400' },
+  green:  { id: 'green',  name: 'Xanh lá',     hex: '#22c55e', lightHex: '#f0fdf4', light: 'bg-green-50 border-green-200',  text: 'text-green-700',  base: 'bg-green-500 hover:bg-green-600',  dark: 'bg-green-600 border-green-700 text-white',  accent: 'border-green-400' },
+  red:    { id: 'red',    name: 'Đỏ',          hex: '#ef4444', lightHex: '#fef2f2', light: 'bg-red-50 border-red-200',      text: 'text-red-700',    base: 'bg-red-500 hover:bg-red-600',      dark: 'bg-red-600 border-red-700 text-white',      accent: 'border-red-400' },
+  orange: { id: 'orange', name: 'Cam',         hex: '#f97316', lightHex: '#fff7ed', light: 'bg-orange-50 border-orange-200',text: 'text-orange-700', base: 'bg-orange-500 hover:bg-orange-600',dark: 'bg-orange-600 border-orange-700 text-white', accent: 'border-orange-400' },
+  purple: { id: 'purple', name: 'Tím',         hex: '#a855f7', lightHex: '#faf5ff', light: 'bg-purple-50 border-purple-200',text: 'text-purple-700', base: 'bg-purple-500 hover:bg-purple-600',dark: 'bg-purple-600 border-purple-700 text-white', accent: 'border-purple-400' },
+  pink:   { id: 'pink',   name: 'Hồng',        hex: '#ec4899', lightHex: '#fdf2f8', light: 'bg-pink-50 border-pink-200',    text: 'text-pink-700',   base: 'bg-pink-500 hover:bg-pink-600',    dark: 'bg-pink-600 border-pink-700 text-white',    accent: 'border-pink-400' },
+  rose:   { id: 'rose',   name: 'Hồng Đậm',    hex: '#f43f5e', lightHex: '#fff1f2', light: 'bg-rose-50 border-rose-200',    text: 'text-rose-700',   base: 'bg-rose-500 hover:bg-rose-600',    dark: 'bg-rose-600 border-rose-700 text-white',    accent: 'border-rose-400' },
+  yellow: { id: 'yellow', name: 'Vàng',        hex: '#f59e0b', lightHex: '#fffbeb', light: 'bg-amber-50 border-amber-200',  text: 'text-amber-700',  base: 'bg-amber-500 hover:bg-amber-600',  dark: 'bg-amber-600 border-amber-700 text-white',  accent: 'border-amber-400' },
+  teal:   { id: 'teal',   name: 'Xanh lơ',     hex: '#14b8a6', lightHex: '#f0fdfa', light: 'bg-teal-50 border-teal-200',    text: 'text-teal-700',   base: 'bg-teal-500 hover:bg-teal-600',    dark: 'bg-teal-600 border-teal-700 text-white',    accent: 'border-teal-400' }
+};
+
+export const getColorTheme = (colorId) => THEMES[colorId] || THEMES['slate'];

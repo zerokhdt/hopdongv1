@@ -1,0 +1,51 @@
+export const SEED_DATA = {
+  employees: [
+    // --- CHI NHÁNH TRUNG MỸ TÂY ---
+    { id: 'TMT001', title: 'Ms', name: 'Trương Kiều Oanh', position: 'Quản lý chi nhánh', department: 'TRUNG MỸ TÂY', startDate: '2023-01-15' },
+    { id: 'TMT002', title: 'Mr', name: 'Trần Vĩnh Hưng', position: 'Trưởng bộ phận', department: 'TRUNG MỸ TÂY', startDate: '2023-03-10' },
+    { id: 'TMT003', title: 'Ms', name: 'Lê Ngọc Mai', position: 'Giáo viên', department: 'TRUNG MỸ TÂY', startDate: '2023-05-20' },
+    { id: 'TMT004', title: 'Ms', name: 'Phạm Thu Thảo', position: 'Nhân viên tư vấn', department: 'TRUNG MỸ TÂY', startDate: '2023-06-01' },
+    { id: 'TMT005', title: 'Mr', name: 'Hoàng Quốc Việt', position: 'Giáo viên', department: 'TRUNG MỸ TÂY', startDate: '2023-08-15' },
+    { id: 'TMT006', title: 'Ms', name: 'Đinh Bích Ngọc', position: 'Giáo viên', department: 'TRUNG MỸ TÂY', startDate: '2024-01-10' },
+    { id: 'TMT007', title: 'Mr', name: 'Vũ Đức Thành', position: 'Nhân viên hành chính', department: 'TRUNG MỸ TÂY', startDate: '2024-02-15' },
+    
+    // --- CHI NHÁNH NGUYỄN ẢNH THỦ ---
+    { id: 'NAT001', title: 'Mr', name: 'Nguyễn Tấn Dũng', position: 'Quản lý chi nhánh', department: 'NGUYỄN ẢNH THỦ', startDate: '2022-11-05' },
+    { id: 'NAT002', title: 'Ms', name: 'Bùi Thị Hà', position: 'Trưởng bộ phận', department: 'NGUYỄN ẢNH THỦ', startDate: '2023-02-14' },
+    { id: 'NAT003', title: 'Ms', name: 'Cao Thanh Xuân', position: 'Giáo viên', department: 'NGUYỄN ẢNH THỦ', startDate: '2023-04-20' },
+    { id: 'NAT004', title: 'Mr', name: 'Lê Hữu Nghĩa', position: 'Nhân viên tư vấn', department: 'NGUYỄN ẢNH THỦ', startDate: '2023-07-05' },
+    { id: 'NAT005', title: 'Ms', name: 'Đỗ Quyên', position: 'Giáo viên', department: 'NGUYỄN ẢNH THỦ', startDate: '2023-09-12' },
+    { id: 'NAT006', title: 'Mr', name: 'Ngô Tấn Tài', position: 'Giáo viên', department: 'NGUYỄN ẢNH THỦ', startDate: '2024-03-01' },
+    { id: 'NAT007', title: 'Ms', name: 'Lý Kim Yến', position: 'Trợ giảng', department: 'NGUYỄN ẢNH THỦ', startDate: '2024-04-10' },
+
+    // --- CHI NHÁNH LÊ LỢI ---
+    { id: 'LL001', title: 'Mr', name: 'Trịnh Xuân Thanh', position: 'Quản lý chi nhánh', department: 'LÊ LỢI', startDate: '2022-08-10' },
+    { id: 'LL002', title: 'Ms', name: 'Võ Kim Phụng', position: 'Trưởng bộ phận', department: 'LÊ LỢI', startDate: '2022-10-01' },
+    { id: 'LL003', title: 'Ms', name: 'Huỳnh Tố Như', position: 'Giáo viên', department: 'LÊ LỢI', startDate: '2023-01-05' },
+    { id: 'LL004', title: 'Mr', name: 'Đoàn Hùng Cường', position: 'Giáo viên', department: 'LÊ LỢI', startDate: '2023-03-18' },
+    { id: 'LL005', title: 'Ms', name: 'Lương Ánh Tuyết', position: 'Giáo viên', department: 'LÊ LỢI', startDate: '2023-06-25' },
+    { id: 'LL006', title: 'Mr', name: 'Mạc Đăng Dung', position: 'Trợ giảng', department: 'LÊ LỢI', startDate: '2023-11-20' },
+    { id: 'LL007', title: 'Ms', name: 'Hà Nhuận Phấn', position: 'Nhân viên hành chính', department: 'LÊ LỢI', startDate: '2024-01-05' },
+  ],
+  branches: [
+    'HQ',
+    'HEAD OFFICE',
+    'TRUNG MỸ TÂY',
+    'NGUYỄN ẢNH THỦ',
+    'LÊ LỢI',
+    'XÓM MỚI',
+    'THỐNG NHẤT',
+    'LIÊN KHU 4-5',
+    'GÒ XOÀI',
+    'XUÂN THỚI THƯỢNG',
+    'PHAN VĂN HỚN',
+    'LÊ VĂN KHƯƠNG',
+    'AN SƯƠNG',
+    'ĐẶNG THÚC VỊNH',
+    'HÀ HUY GIÁP',
+    'TÂN SƠN NHÌ',
+    'THỚI AN',
+    'DREAM HOME',
+    'PHAN THIẾT',
+  ],
+}

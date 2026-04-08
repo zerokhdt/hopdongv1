@@ -1,0 +1,122 @@
+[
+  {
+    "kind": "html",
+    "title": "ACE - CAM KẾT QUYỀN LỢI - BẢO VỆ",
+    "slug": "ace_cam_ket_quyen_loi_bao_ve.html",
+    "dest": "public/contracts/total_hd/ace_cam_ket_quyen_loi_bao_ve.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - CAM KẾT QUYỀN LỢI - PART TIME",
+    "slug": "ace_cam_ket_quyen_loi_part_time.html",
+    "dest": "public/contracts/total_hd/ace_cam_ket_quyen_loi_part_time.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - CAM KẾT QUYỀN LỢI - TẠP VỤ",
+    "slug": "ace_cam_ket_quyen_loi_tap_vu.html",
+    "dest": "public/contracts/total_hd/ace_cam_ket_quyen_loi_tap_vu.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - CAM KẾT QUYỀN LỢI - THỈNH GIẢNG",
+    "slug": "ace_cam_ket_quyen_loi_thinh_giang.html",
+    "dest": "public/contracts/total_hd/ace_cam_ket_quyen_loi_thinh_giang.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - CAM KẾT QUYỀN LỢI - TRỢ GIẢNG",
+    "slug": "ace_cam_ket_quyen_loi_tro_giang.html",
+    "dest": "public/contracts/total_hd/ace_cam_ket_quyen_loi_tro_giang.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - HỢP ĐỒNG CỘNG TÁC VIÊN",
+    "slug": "ace_hop_dong_cong_tac_vien.html",
+    "dest": "public/contracts/total_hd/ace_hop_dong_cong_tac_vien.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - HỢP ĐỒNG LAO ĐỘNG BÁN THỜI GIAN CÓ THAM GIA BHXH",
+    "slug": "ace_hop_dong_lao_dong_ban_thoi_gian_co_tham_gia_bhxh.html",
+    "dest": "public/contracts/total_hd/ace_hop_dong_lao_dong_ban_thoi_gian_co_tham_gia_bhxh.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - HỢP ĐỒNG LAO ĐỘNG TOÀN THỜI GIAN",
+    "slug": "ace_hop_dong_lao_dong_toan_thoi_gian.html",
+    "dest": "public/contracts/total_hd/ace_hop_dong_lao_dong_toan_thoi_gian.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - HỢP ĐỒNG THỬ VIỆC NHÂN VIÊN TOÀN THỜI GIAN",
+    "slug": "ace_hop_dong_thu_viec_nhan_vien_toan_thoi_gian.html",
+    "dest": "public/contracts/total_hd/ace_hop_dong_thu_viec_nhan_vien_toan_thoi_gian.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - THỎA THUẬN CÔNG VIỆC - BẢO VỆ",
+    "slug": "ace_thoa_thuan_cong_viec_bao_ve.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_cong_viec_bao_ve.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - THỎA THUẬN CÔNG VIỆC - GIÁO VIÊN CƠ HỮU",
+    "slug": "ace_thoa_thuan_cong_viec_giao_vien_co_huu.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_cong_viec_giao_vien_co_huu.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - THỎA THUẬN CÔNG VIỆC - NHÂN VIÊN CƠ HỮU",
+    "slug": "ace_thoa_thuan_cong_viec_nhan_vien_co_huu.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_cong_viec_nhan_vien_co_huu.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - THỎA THUẬN CÔNG VIỆC - PART TIME",
+    "slug": "ace_thoa_thuan_cong_viec_part_time.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_cong_viec_part_time.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - THỎA THUẬN CÔNG VIỆC - TẠP VỤ",
+    "slug": "ace_thoa_thuan_cong_viec_tap_vu.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_cong_viec_tap_vu.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - THỎA THUẬN CÔNG VIỆC - THỈNH GIẢNG",
+    "slug": "ace_thoa_thuan_cong_viec_thinh_giang.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_cong_viec_thinh_giang.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - THỎA THUẬN CÔNG VIỆC - TRỢ GIẢNG",
+    "slug": "ace_thoa_thuan_cong_viec_tro_giang.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_cong_viec_tro_giang.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - THỎA THUẬN CÔNG VIỆC - TRƯỞNG BỘ PHẬN CHẤT LƯỢNG",
+    "slug": "ace_thoa_thuan_cong_viec_truong_bo_phan_chat_luong.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_cong_viec_truong_bo_phan_chat_luong.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - THỎA THUẬN CÔNG VIỆC - TRƯỞNG BỘ PHẬN VĂN PHÒNG",
+    "slug": "ace_thoa_thuan_cong_viec_truong_bo_phan_van_phong.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_cong_viec_truong_bo_phan_van_phong.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE - THOẢ THUẬN HỌC VIỆC",
+    "slug": "ace_thoa_thuan_hoc_viec.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_hoc_viec.html"
+  },
+  {
+    "kind": "html",
+    "title": "ACE-THỎA THUẬN CÔNG VIỆC-QLCN",
+    "slug": "ace_thoa_thuan_cong_viec_qlcn.html",
+    "dest": "public/contracts/total_hd/ace_thoa_thuan_cong_viec_qlcn.html"
+  }
+]
