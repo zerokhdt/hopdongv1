@@ -947,7 +947,21 @@ function HistoryList() {
           createdAt: item.created_at || item.dateCreated || new Date().toISOString(),
           type: item.loai_bien_dong || 'ONBOARDING',
           branchId: item.chi_nhanh || item.branch || '---',
-          details: item.chuc_danh || {},
+          details: {
+            employeeId: item.ma_nv,
+            position: item.chuc_danh || '---',
+            department: item.chi_nhanh || '---',
+            salary: item.muc_luong || '---',
+            salaryText: item.luong_text || '---',
+            phone: item.dien_thoai || '---',
+            cccd: item.cccd || '---',
+            cccdPlace: item.cccd_noi_cap || '---',
+            cccdDate: item.cccd_ngay_cap || '---',
+            newRole: item.chuc_danh_moi,
+            newDepartment: item.phong_ban_moi,
+            newSalary: item.muc_luong_moi,
+            reason: item.ly_do
+          },
           decisionNote: item.ghi_chu || item.note || '',
           branchNote: item.ghi_chu || '',
           attachments: item.attachments || []
