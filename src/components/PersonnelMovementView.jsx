@@ -1233,8 +1233,53 @@ function MovementDetailModal({ movement, onClose, onApprove, onReject, onRevisio
 
 // ─── DASHBOARD: HRM PHÊ DUYỆT ─────────────────────────────────────────
 function ApprovalDashboard({ movements, onApprove, onReject, onRevision }) {
+  const [movements, setMovements] = useState([]);
   const [selected, setSelected] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // ✅ Lấy dữ liệu từ API
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const response = await fetch('https://hopdong-delta.vercel.app/api/get-pending-bd');
+        const data = await response.json();
+
+        // Nếu API trả về field khác, map về đúng structure movements
+        const formatted = (data.contracts || []).map(item => ({
+          id: item.ma_nv || item.contractId || Math.random().toString(36).substr(2, 9),
+          employeeName: item.ten_nhan_vien || item.name || '---',
+          status: item.trang_thai || 'PENDING',
+          createdAt: item.created_at || item.dateCreated || new Date().toISOString(),
+          type: item.loai_bien_dong || 'ONBOARDING',
+          branchId: item.chi_nhanh || item.branch || '---',
+          details: {
+            employeeId: item.ma_nv,
+            position: item.chuc_danh || '---',
+            department: item.chi_nhanh || '---',
+            salary: item.muc_luong || '---',
+            salaryText: item.luong_text || '---',
+            phone: item.dien_thoai || '---',
+            cccd: item.cccd || '---',
+            cccdPlace: item.cccd_noi_cap || '---',
+            cccdDate: item.cccd_ngay_cap || '---',
+            newRole: item.chuc_danh_moi,
+            newDepartment: item.phong_ban_moi,
+            newSalary: item.muc_luong_moi,
+            reason: item.ly_do
+          },
+          decisionNote: item.ghi_chu || item.note || '',
+          branchNote: item.ghi_chu || '',
+          attachments: item.attachments || []
+        }));
+
+        setMovements(formatted);
+      } catch (err) {
+        console.error("Lỗi load movements:", err);
+        setMovements([]);
+      }
+    }
+    loadData();
+  }, []); // Chỉ chạy 1 lần khi mount
   
   const sortedMovements = useMemo(() => {
     return [...movements].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
