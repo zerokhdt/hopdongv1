@@ -321,7 +321,7 @@ function OnboardingForm({ onSubmit, maskSalary = false }) {
 
   useEffect(() => {
     const fetchContracts = async () => {
-      console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+      console.log('Supabase URL:', process.env.SUPABASE_URL);
       try {
         const res = await fetch('https://hopdong-delta.vercel.app/api/get-pending-contracts');
         const json = await res.json();
